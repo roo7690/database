@@ -1,0 +1,8 @@
+*
+!*.conf
+!app
+!res
+!requirements.txt
+!.env*
+!.venv/packages
+!key

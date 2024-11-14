@@ -1,0 +1,102 @@
+version: '1.1.0'
+
+networks:
+  database:
+    driver: bridge
+
+x-mongo: &mongo
+  image: mongo
+  restart: always
+  env_file:
+    - .env.local
+  networks:
+    - database
+  command: --replSet rs --bind_ip_all --keyFile /data/db/keyfile
+
+services:
+  mongo1:
+    <<: *mongo
+    container_name: mongo1.db
+    volumes:
+      - mongo1-data:/data/db
+      - ./key/keyfile:/data/db/keyfile
+    ports:
+      - '27017:27017'
+
+  mongo2:
+    <<: *mongo
+    container_name: mongo2.db
+    volumes:
+      - mongo2-data:/data/db
+      - ./key/keyfile:/data/db/keyfile
+    ports:
+      - '27018:27017'
+
+  mongo3:
+    <<: *mongo
+    container_name: mongo3.db
+    volumes:
+      - mongo3-data:/data/db
+      - ./key/keyfile:/data/db/keyfile
+    ports:
+      - '27019:27017'
+  
+  mongo4:
+    <<: *mongo
+    container_name: mongo4.db
+    volumes:
+      - mongo4-data:/data/db
+      - ./key/keyfile:/data/db/keyfile
+    ports:
+      - '27020:27017'
+  
+  mongo-express:
+    container_name: mongo-express.db
+    image: mongo-express
+    restart: always
+    env_file:
+      - .env.local
+    networks:
+      - database
+
+  postgres:
+    container_name: postgres.db
+    image: postgres
+    restart: always
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    env_file:
+      - .env.local
+    ports:
+      - '5423:5432'
+    networks:
+      - database
+
+  adminer:
+    container_name: adminer.db
+    image: adminer
+    restart: always
+    networks:
+      - database
+
+  db:
+    container_name: nginx.db
+    image: nginx.db:0.1.0
+    build:
+      dockerfile: nginx.dockerfile
+    ports:
+      - '8082:8082'
+    networks:
+      - database
+
+volumes:
+  mongo1-data:
+    driver: local
+  mongo2-data:
+    driver: local
+  mongo3-data:
+    driver: local
+  mongo4-data:
+    driver: local
+  postgres-data:
+    driver: local
